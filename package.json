@@ -1,0 +1,37 @@
+{
+  "name": "file-converter-web-app",
+  "version": "1.0.0",
+  "description": "Web application for converting files (PDF to DOCX via pdf2docx) and images",
+  "main": "server.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon server.js",
+    "client": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "start": "node server.js",
+    "install-all": "npm install && cd client && npm install"
+  },
+  "keywords": [
+    "file-converter",
+    "pdf",
+    "docx",
+    "pdf2docx",
+    "images",
+    "web-app"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "fs-extra": "^11.1.1",
+    "mammoth": "^1.6.0",
+    "multer": "^1.4.5-lts.1",
+    "path": "^0.12.7",
+    "sharp": "^0.32.6"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.1"
+  }
+}
