@@ -74,6 +74,9 @@ const DocxConverter = () => {
     setError(null);
 
     const formData = new FormData();
+    const API_BASE_URL = process.env.NODE_ENV === 'development' 
+    ? 'http://localhost:5000/api' 
+    : '/api';
     
     try {
       let response;
@@ -85,7 +88,7 @@ const DocxConverter = () => {
           formData.append('files', file);
         });
         
-        endpoint = 'http://localhost:5000/api/convert/docxs-to-pdf';
+        endpoint = `${API_BASE_URL}/convert/docxs-to-pdf`;
         
         response = await axios.post(endpoint, formData, {
           headers: {
@@ -95,7 +98,7 @@ const DocxConverter = () => {
       } else if (outputFormat === 'pdf') {
         // Одиночная конвертация DOCX в PDF
         formData.append('file', selectedFiles[0]);
-        endpoint = 'http://localhost:5000/api/convert/docx-to-pdf';
+        endpoint = `${API_BASE_URL}/convert/docx-to-pdf`;
         
         response = await axios.post(endpoint, formData, {
           headers: {
@@ -106,7 +109,7 @@ const DocxConverter = () => {
         // Для HTML/TXT используем старый endpoint
         formData.append('file', selectedFiles[0]);
         formData.append('format', outputFormat);
-        endpoint = 'http://localhost:5000/api/convert/docx';
+          endpoint = `${API_BASE_URL}/convert/docx`;
         
         response = await axios.post(endpoint, formData, {
           headers: {
@@ -136,7 +139,7 @@ const DocxConverter = () => {
 
   const handleDownload = (url, filename) => {
     const link = document.createElement('a');
-    link.href = `http://localhost:5000${url}`;
+    link.href = `${API_BASE_URL}${url}`;
     link.download = filename;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';

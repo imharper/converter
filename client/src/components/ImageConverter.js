@@ -63,7 +63,10 @@ const ImageConverter = () => {
     formData.append('quality', quality);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/convert/image', formData, {
+      const API_BASE_URL = process.env.NODE_ENV === 'development' 
+      ? 'http://localhost:5000/api' 
+      : '/api';
+      const response = await axios.post(`${API_BASE_URL}/convert/image`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -87,7 +90,7 @@ const ImageConverter = () => {
 
   const handleDownload = (url, filename) => {
     const link = document.createElement('a');
-    link.href = `http://localhost:5000${url}`;
+    link.href = `${API_BASE_URL}${url}`;
     link.download = filename;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';

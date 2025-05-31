@@ -74,7 +74,10 @@ const PdfConverter = () => {
     setConversionProgress(0);
 
     const formData = new FormData();
-    
+    const API_BASE_URL = process.env.NODE_ENV === 'development' 
+    ? 'http://localhost:5000/api' 
+    : '/api';
+
     try {
       let response;
       let endpoint;
@@ -87,10 +90,10 @@ const PdfConverter = () => {
         formData.append('format', outputFormat);
 
         if (outputFormat === 'docx') {
-          endpoint = 'http://localhost:5000/api/convert/pdfs-to-docx';
+          endpoint = `${API_BASE_URL}/convert/pdfs-to-docx`;
         } else {
           // Для изображений пока используем по одному файлу
-          endpoint = 'http://localhost:5000/api/convert/pdf-to-image';
+          endpoint = `${API_BASE_URL}/convert/pdf-to-image`;
         }
 
         // Симуляция прогресса для множественной конвертации
@@ -115,7 +118,7 @@ const PdfConverter = () => {
         formData.append('format', outputFormat);
 
         if (outputFormat === 'docx') {
-          endpoint = 'http://localhost:5000/api/convert/pdf-to-docx';
+          endpoint = `${API_BASE_URL}/convert/pdf-to-docx`;
           
           const progressInterval = setInterval(() => {
             setConversionProgress(prev => {
@@ -133,7 +136,7 @@ const PdfConverter = () => {
           clearInterval(progressInterval);
           setConversionProgress(100);
         } else {
-          endpoint = 'http://localhost:5000/api/convert/pdf-to-image';
+          endpoint = `${API_BASE_URL}/convert/pdf-to-image`;
           response = await axios.post(endpoint, formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
@@ -183,7 +186,7 @@ const PdfConverter = () => {
 
   const handleDownload = (url, filename) => {
     const link = document.createElement('a');
-    link.href = `http://localhost:5000${url}`;
+    link.href = `${API_BASE_URL}${url}`;
     link.download = filename;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
