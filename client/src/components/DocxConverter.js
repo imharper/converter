@@ -64,6 +64,10 @@ const DocxConverter = () => {
     multiple: true
   });
 
+  const API_BASE_URL = process.env.NODE_ENV === 'development' 
+    ? 'http://localhost:5000/api' 
+    : '/api';
+
   const handleConvert = async () => {
     if (!selectedFiles || selectedFiles.length === 0) {
       setError('Пожалуйста, выберите DOCX файлы');
@@ -74,9 +78,6 @@ const DocxConverter = () => {
     setError(null);
 
     const formData = new FormData();
-    const API_BASE_URL = process.env.NODE_ENV === 'development' 
-    ? 'http://localhost:5000/api' 
-    : '/api';
     
     try {
       let response;

@@ -42,6 +42,10 @@ const PdfConverter = () => {
   const [error, setError] = useState(null);
   const [conversionProgress, setConversionProgress] = useState(0);
 
+  const API_BASE_URL = process.env.NODE_ENV === 'development' 
+    ? 'http://localhost:5000/api' 
+    : '/api';
+
   const onDrop = useCallback((acceptedFiles) => {
     const pdfFiles = acceptedFiles.filter(file => file.type === 'application/pdf');
     if (pdfFiles.length === 0) {
@@ -74,9 +78,7 @@ const PdfConverter = () => {
     setConversionProgress(0);
 
     const formData = new FormData();
-    const API_BASE_URL = process.env.NODE_ENV === 'development' 
-    ? 'http://localhost:5000/api' 
-    : '/api';
+
 
     try {
       let response;

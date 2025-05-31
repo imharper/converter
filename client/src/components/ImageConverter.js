@@ -31,6 +31,10 @@ const ImageConverter = () => {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
+  const API_BASE_URL = process.env.NODE_ENV === 'development' 
+    ? 'http://localhost:5000/api' 
+    : '/api';
+
   const onDrop = useCallback((acceptedFiles) => {
     const file = acceptedFiles[0];
     if (file) {
@@ -63,9 +67,7 @@ const ImageConverter = () => {
     formData.append('quality', quality);
 
     try {
-      const API_BASE_URL = process.env.NODE_ENV === 'development' 
-      ? 'http://localhost:5000/api' 
-      : '/api';
+      
       const response = await axios.post(`${API_BASE_URL}/convert/image`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
