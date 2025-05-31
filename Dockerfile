@@ -1,22 +1,14 @@
-FROM node:20-bullseye
-
-RUN apt-get update && apt-get install -y python3-venv python3-pip
-
+FROM node:16
 WORKDIR /app
+
+RUN apt-get update && apt-get install -y python3 python3-pip
+COPY requirements.txt .
+RUN pip3 install -r requirements.txt
+
+COPY package*.json ./
+RUN npm install
 
 COPY . .
 
-RUN python3 -m venv /app/venv && \
-    /app/venv/bin/pip install --upgrade pip && \
-    /app/venv/bin/pip install -r requirements.txt
-
-RUN npm install
-
-WORKDIR /app/client
-RUN npm install
-
-WORKDIR /app
-
-ENV PATH="/app/venv/bin:$PATH"
-
-CMD ["npm", "run", "dev"]
+EXPOSE 5000
+CMD ["npm", "start"]
