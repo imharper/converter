@@ -92,7 +92,11 @@ const ImageConverter = () => {
 
   const handleDownload = (url, filename) => {
     const link = document.createElement('a');
-    link.href = `${API_BASE_URL}${url}`;
+    // Кодируем URL для правильной обработки кириллических символов
+    const encodedUrl = `${API_BASE_URL}${url}`.split('/').map((part, index) => 
+      index < 3 ? part : encodeURIComponent(part)
+    ).join('/');
+    link.href = encodedUrl;
     link.download = filename;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';

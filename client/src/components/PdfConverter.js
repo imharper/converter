@@ -186,12 +186,65 @@ const PdfConverter = () => {
     return <Photo />;
   };
 
-  const handleDownload = (url, filename) => {
+  const checkFileAvailability = async (url) => {
+    try {
+      const encodedUrl = `${API_BASE_URL}${url}`.split('/').map((part, index) => 
+        index < 3 ? part : encodeURIComponent(part)
+      ).join('/');
+      
+      const response = await fetch(encodedUrl, { method: 'HEAD' });
+      return response.ok;
+    } catch (error) {
+      console.error('Ошибка при проверке доступности файла:', error);
+      return false;
+    }
+  };
+
+  const handleDownload = async (url, filename) => {
+    console.log('Попытка скачивания файла:', {
+      originalUrl: `${API_BASE_URL}${url}`,
+      filename: filename
+    });
+
+    // Проверяем доступность файла
+    const isAvailable = await checkFileAvailability(url);
+    if (!isAvailable) {
+      console.error('Файл недоступен по указанному пути');
+      setError(`Файл ${filename} недоступен для скачивания. Возможно, он был удален или произошла ошибка.`);
+      return;
+    }
+
     const link = document.createElement('a');
-    link.href = `${API_BASE_URL}${url}`;
+    // Кодируем URL для правильной обработки кириллических символов
+    const encodedUrl = `${API_BASE_URL}${url}`.split('/').map((part, index) => 
+      index < 3 ? part : encodeURIComponent(part)
+    ).join('/');
+    
+    link.href = encodedUrl;
     link.download = filename;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
+    
+    // Добавляем обработчик ошибок
+    link.onerror = () => {
+      console.error('Ошибка при скачивании через статический маршрут, пробуем через API...');
+      // Попробуем альтернативный способ через API download
+      const apiUrl = url.replace('/converted/', '/api/download/');
+      const apiEncodedUrl = `${API_BASE_URL.replace('/api', '')}${apiUrl}`.split('/').map((part, index) => 
+        index < 3 ? part : encodeURIComponent(part)
+      ).join('/');
+      
+      console.log('Пробуем альтернативный URL:', apiEncodedUrl);
+      const fallbackLink = document.createElement('a');
+      fallbackLink.href = apiEncodedUrl;
+      fallbackLink.download = filename;
+      fallbackLink.target = '_blank';
+      fallbackLink.rel = 'noopener noreferrer';
+      document.body.appendChild(fallbackLink);
+      fallbackLink.click();
+      document.body.removeChild(fallbackLink);
+    };
+    
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -390,6 +443,7 @@ const PdfConverter = () => {
                           startIcon={<Download />}
                           onClick={() => handleDownload(file.downloadUrl, file.filename)}
                           fullWidth
+                          sx={{ mb: 1 }}
                         >
                           Скачать
                         </Button>
@@ -496,6 +550,16 @@ const PdfConverter = () => {
             sx={{ mt: 1 }}
           >
             Скачать {result.filename}
+          </Button>
+          <Button
+            variant="text"
+            onClick={async () => {
+              const isAvailable = await checkFileAvailability(result.downloadUrl);
+              alert(isAvailable ? 'Файл доступен' : 'Файл недоступен');
+            }}
+            sx={{ mt: 1, ml: 1, fontSize: '0.8rem' }}
+          >
+            Проверить статус
           </Button>
         </Alert>
       )}

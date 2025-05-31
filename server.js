@@ -18,6 +18,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 app.use('/converted', express.static('converted'));
+app.use('/api/converted', express.static('converted'));
 
 // Создаем необходимые директории
 fs.ensureDirSync('uploads');
@@ -737,6 +738,41 @@ app.post('/api/convert/docxs-to-pdf', upload.array('files', 10), async (req, res
     res.status(500).json({ error: 'Ошибка при конвертации DOCX файлов' });
   }
 });
+
+// Функция для очистки старых файлов
+const cleanupOldFiles = async () => {
+  try {
+    const directories = ['converted', 'uploads', 'temp-conversion'];
+    const maxAge = 2 * 60 * 60 * 1000; // 2 часа в миллисекундах
+    
+    for (const dir of directories) {
+      if (!fs.existsSync(dir)) continue;
+      
+      const files = fs.readdirSync(dir);
+      for (const file of files) {
+        const filePath = path.join(dir, file);
+        const stats = fs.statSync(filePath);
+        
+        if (Date.now() - stats.mtime.getTime() > maxAge) {
+          if (stats.isDirectory()) {
+            fs.removeSync(filePath);
+          } else {
+            fs.unlinkSync(filePath);
+          }
+          console.log(`Удален старый файл: ${filePath}`);
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Ошибка при очистке старых файлов:', error);
+  }
+};
+
+// Запускаем очистку при старте сервера
+cleanupOldFiles();
+
+// Запускаем очистку каждые 30 минут
+setInterval(cleanupOldFiles, 30 * 60 * 1000);
 
 // Serve React app in production
 if (process.env.NODE_ENV === 'production') {
